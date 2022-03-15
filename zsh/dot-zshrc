@@ -42,7 +42,7 @@ ZSH_THEME="mortalscumbag"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # Caution: this setting can cause issues with multiline prompts (zsh 5.7.1 and newer seem to work)
@@ -52,7 +52,7 @@ ZSH_THEME="mortalscumbag"
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -72,53 +72,73 @@ ZSH_THEME="mortalscumbag"
 # Add wisely, as too many plugins slow down shell startup.
 
 plugins=(
-git
+git 
+man 
+sudo 
+wd 
 )
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
-
-export MANPATH="/usr/local/man:$MANPATH"
+# MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
-export LANG=en_US.UTF-8
+#export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='$(where vim)'
+    export EDITOR="$(which vim)"
 else
-    export EDITOR='$(where nvim)'
+    export EDITOR="$(which nvim)"
 fi
 
 # Compilation flags
 export ARCHFLAGS="-arch x86_64"
 
 # user folders
-export USERSRC=$HOME/sources
-export USERSCRIPTS=$HOME/scripts
-export SCRIPTUTILS=$USERSCRIPTS/utils
-export AUTORUN=$USERSCRIPTS/autorun
-export USERALIASES=$USERSCRIPTS/aliases
-
-# add folders to PATH
-PATH="${SCRIPTUTILS}:$PATH"
-
-# register user aliases
-alias_folder="${USERALIASES}"
-for alias_file ($alias_folder/*); do
-    source "${alias_file}"
-done
-unset alias_file alias_folder
-
-# register autorun scripts
-autorun_folder="${AUTORUN}"
-for autorun ($autorun_folder/*); do
-    source "${autorun}"
-done
-unset autorun autorun_folder
+export USER_SRC=$HOME/src
+export USER_SCRIPTS=$HOME/.scripts
+export AUTORUN=$USER_SCRIPTS/autorun
 
 # keyboard layouts
-alias kbmap-us='setxkbmap us'
-alias kbmap-latam='setxkbmap latam'
+alias kb-us='sudo setxkbmap us'
+alias kb-es='sudo setxkbmap latam'
+
+# aliases to open important config files
+alias bashrc="$EDITOR $HOME/.bashrc"
+alias zshrc="$EDITOR $HOME/.zshrc"
+alias i3rc="$EDITOR $HOME/.i3/config"
+
+# aliases
+USER_ALIASES="$USER_SCRIPTS/aliases"
+if [ -d "$USER_ALIASES" ]; then
+    [[ -f "${USER_ALIASES}/init.sh" && -r "${USER_ALIASES}/init.sh" ]] && {
+        . ${USER_ALIASES}/init.sh
+    }
+fi
+unset USER_ALIASES
+
+#auto runs
+USER_AUTORUNS="$USER_SCRIPTS/autorun"
+if [ -d "$USER_AUTORUNS" ]; then
+    [[ -f "${USER_AUTORUNS}/init.sh" && -r "${USER_AUTORUNS}/init.sh" ]] && {
+        . ${USER_AUTORUNS}/init.sh
+    }
+fi
+unset USER_AUTORUNS
+
+# add python to path
+export PYTHON2_PATH="$(which python)"
+export PYTHON3_PATH="$(which python3)"
+
+# export man path
+export MAN_PATH="$(which man)"
+
+# add to to path
+if [ -d "$USER_SCRIPTS" ]; then
+    export PATH=$PYTHON3_PATH:$PYTHON2_PATH:$USER_SCRIPTS:$MAN_PATH:$PATH
+else
+    export PATH=$PYTHON3_PATH:$PYTHON2_PATH:$MAN_PATH:$PATH
+fi
 

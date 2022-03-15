@@ -1,2 +1,0 @@
-# dotfiles
-Linux dot files
